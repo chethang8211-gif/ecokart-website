@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EcoKart • Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="auth-guard.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="tb-inner">
+    <div class="brand-wrap"><span class="leaf">🌿</span><span class="brand-name">EcoKart</span></div>
+    <nav class="tb-nav">
+      <a class="tb-link" href="index.html">🏠 Home</a>
+      <a class="tb-link" href="buy.html">🛒 Buy Products</a>
+      <a class="tb-link" href="sell.html">📤 Sell Product</a>
+      <a class="tb-link" href="wallet.html">🪙 EcoCoin Wallet</a>
+      <a class="tb-link" href="plant.html">🪴 Plant Store</a>
+      <a class="tb-link active" href="dashboard.html">🔐 Account</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container" style="max-width:520px;text-align:center">
+  <h1 class="h1">Welcome, <span id="userEmail">…</span></h1>
+  <p class="sub">You're logged in. This page is protected by <code>/api/me</code>.</p>
+  <button class="btn" id="logout" style="margin-top:20px">Log out</button>
+</main>
+
+<script>
+  // Frontend is served by the backend, so relative URLs work.
+  // If you host the frontend separately, set this to the backend origin.
+  const API_URL = '';
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    window.location.href = 'login.html';
+  }
+
+  fetch(`${API_URL}/api/me`, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error('Unauthorized');
+      return res.json();
+    })
+    .then((data) => {
+      document.getElementById('userEmail').textContent = data.email;
+    })
+    .catch(() => {
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    });
+
+  document.getElementById('logout').addEventListener('click', () => {
+    localStorage.removeItem('token');
+    window.location.href = 'login.html';
+  });
+</script>
+</body>
+</html>

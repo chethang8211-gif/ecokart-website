@@ -1,0 +1,66 @@
+:root{--green:#0aa03f;--green-dark:#088636;--bg:#f3fbf6;--card:#fff;--muted:#6c7a84;--border:#e6eef2}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:linear-gradient(#f3fbf6,#ffffff);color:#112126}
+
+/* Top Navbar */
+.topbar{background:var(--green);color:#fff}
+.tb-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:18px;padding:10px 18px}
+.brand-wrap{display:flex;align-items:center;gap:8px;font-weight:800}
+.leaf{font-size:18px}.brand-name{font-size:18px}
+.tb-nav{display:flex;gap:12px;margin-left:10px}
+.tb-link{color:#eaffea;text-decoration:none;background:rgba(255,255,255,.08);padding:6px 10px;border-radius:8px;display:flex;align-items:center;gap:6px}
+.tb-link:hover{background:rgba(255,255,255,.18)}
+.tb-link.active{background:rgba(255,255,255,.28);color:#fff}
+.coins-pill{margin-left:auto;background:#0fc25a;padding:6px 10px;border-radius:999px;font-weight:800}
+
+/* Generic layout */
+.container{max-width:1100px;margin:24px auto 36px;padding:0 16px}
+.h1{font-size:28px;font-weight:800;color:#0c7a2e}
+.sub{color:var(--muted)}
+
+/* Buttons & Chips */
+.btn{background:var(--green);color:#fff;border:0;border-radius:10px;padding:10px 14px;cursor:pointer}
+.btn-outline{background:#fff;color:var(--green);border:1px solid var(--green)}
+.btn-pill{border-radius:999px;padding:10px 18px;font-weight:700;text-decoration:none;display:inline-block}
+.btn-pill.primary{background:var(--green);color:#fff}
+.btn-pill.primary:hover{background:var(--green-dark)}
+.btn-pill.outline{background:#fff;border:1px solid var(--green);color:var(--green)}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 18px}
+.chip{border:1px solid #dbe7ef;background:#f3fbf6;color:#0a9f3f;border-radius:999px;padding:8px 14px}
+
+/* Cards & Grid */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 6px 16px rgba(15,23,42,.06)}
+.card h3{margin:6px 0}
+.kv{color:var(--muted)}
+.card-img{width:100%;height:160px;border-radius:10px;object-fit:cover;background:#eef2f7;margin-bottom:10px;border:1px solid var(--border)}
+.meta{display:flex;align-items:center;justify-content:space-between}
+.tag{background:#ecfeff;color:#0369a1;border:1px solid #bae6fd;border-radius:999px;padding:4px 8px;font-size:12px}
+
+/* Home specific */
+.home-wrap{max-width:1100px;margin:24px auto 36px;padding:0 16px;text-align:center}
+.shop-title{text-align:center;margin:18px 0 10px}
+.cat-row{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;justify-items:center}
+.cat-card{width:200px;height:120px;background:#eef9f2;border:1px solid #dcede2;border-radius:16px;text-decoration:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transition:transform .1s,box-shadow .1s}
+.cat-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(16,185,129,.15)}
+.cat-icon{font-size:28px}.cat-name{color:#0e5130;font-weight:800}
+
+/* Wallet */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:18px 0}
+.stat{padding:18px;border-radius:14px;color:#fff}
+.stat .big{font-size:28px;font-weight:900}
+.stat.green{background:linear-gradient(135deg,#10b981,#059669)}
+.stat.blue{background:linear-gradient(135deg,#3b82f6,#2563eb)}
+.stat.purple{background:linear-gradient(135deg,#a855f7,#7c3aed)}
+.list{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px}
+.delta.plus{background:#dcfce7;color:#14532d;border-radius:999px;padding:4px 8px}
+.delta.minus{background:#fee2e2;color:#7f1d1d;border-radius:999px;padding:4px 8px}
+
+/* Forms */
+.form{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;max-width:560px}
+.input{display:flex;flex-direction:column;margin:10px 0}
+.input label{font-weight:700;margin-bottom:6px}
+.input input{padding:10px 12px;border:1px solid var(--border);border-radius:10px}
+.mt-16{margin-top:16px}
+.center{display:flex;align-items:center;gap:10px;justify-content:center}

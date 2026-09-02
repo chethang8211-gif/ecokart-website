@@ -1,0 +1,49 @@
+# Render Blueprint - deploys the EcoKart backend + a Postgres database.
+# In the Render dashboard: New > Blueprint, point it at this repo, apply.
+# Docs: https://render.com/docs/blueprint-spec
+#
+# After the first deploy, note the service URL (https://<name>.onrender.com)
+# and put it in netlify.toml (the two redirect targets).
+
+services:
+  - type: web
+    name: ecokart-backend
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      # Signing secret for JWTs - Render generates a strong random value.
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      # Managed Postgres requires SSL.
+      - key: PGSSL
+        value: "true"
+      # Your Netlify site origin, e.g. https://ecokart.netlify.app
+      # Not strictly required (Netlify proxies server-side) but set it if you
+      # ever call the backend directly from the browser. Set in dashboard.
+      - key: CORS_ORIGIN
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ecokart-db
+          property: connectionString
+
+databases:
+  - name: ecokart-db
+    plan: free
+    databaseName: ecokart
+    user: ecokart
+
+# NOTE: Render's free web tier has an ephemeral filesystem and no persistent
+# disk, so product images uploaded via /api/products (multer -> backend/uploads)
+# are lost on every redeploy/restart. Options:
+#   - upgrade the service and add a Disk mounted at /opt/render/project/src/backend/uploads
+#   - or move uploads to object storage (S3/Cloudinary/Supabase Storage)

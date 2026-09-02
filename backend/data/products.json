@@ -1,0 +1,51 @@
+[
+  {
+    "id": 1,
+    "name": "Recycled Canvas Bag",
+    "price": 299,
+    "ecoImpact": "Made from 8 recycled plastic bottles",
+    "imageUrl": "https://www.sailsandcanvas.co.uk/wp-content/uploads/2022/01/Tote-Bag-Mix-Group.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Upcycled Notebook",
+    "price": 150,
+    "ecoImpact": "Made from 20 sheets of recycled paper",
+    "imageUrl": "https://www.pack-mate.in/cdn/shop/files/packmate-spiral-notebook-ruled-pack-of-5-made-from-100-recycled-paper_1445x.webp?v=1728120906"
+  },
+  {
+    "id": 3,
+    "name": "Recycled Plastic Planter",
+    "price": 199,
+    "ecoImpact": "Made from 3 recycled plastic containers",
+    "imageUrl": "https://supersimple.com/wp-content/uploads/1070197-scaled.jpg"
+  },
+  {
+    "id": 4,
+    "name": "pen stand ",
+    "price": 200,
+    "ecoImpact": "made with recycled wood",
+    "imageUrl": "https://kavipoetryart.in/cdn/shop/products/CorkPenstandHolder.jpg?v=1683434945"
+  },
+  {
+    "id": 5,
+    "name": "glass bottle ",
+    "price": 223,
+    "ecoImpact": "made with recycled glass",
+    "imageUrl": "/uploads/ca1b4038b4ad13b44fa4ffae91c76f5d"
+  },
+  {
+    "id": 6,
+    "name": "pencil ",
+    "price": 50,
+    "ecoImpact": "made with recycled wood and lead",
+    "imageUrl": "/uploads/82dda9f8e9314c10f44c8b691dc4f26f"
+  },
+  {
+    "id": 7,
+    "name": "pencil ",
+    "price": 232,
+    "ecoImpact": "made with recycled wood and lead",
+    "imageUrl": "/uploads/e7b59b75ed671f2cee1ba93be61f6f76"
+  }
+]

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>EcoKart • Sell Product</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="auth-guard.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="tb-inner">
+      <div class="brand-wrap"><span class="leaf">🌿</span><span class="brand-name">EcoKart</span></div>
+      <nav class="tb-nav">
+        <a class="tb-link" href="index.html">🏠 Home</a>
+        <a class="tb-link" href="buy.html">🛒 Buy Products</a>
+        <a class="tb-link active" href="sell.html">📤 Sell Product</a>
+        <a class="tb-link" href="wallet.html">🪙 EcoCoin Wallet</a>
+        <a class="tb-link" href="plant.html">🪴 Plant Store</a>
+        <a class="tb-link" href="login.html">🔐 Login</a>
+      </nav>
+      <div class="coins-pill" id="topCoins">0 EcoCoins</div>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1 class="h1">Sell Your Recycled Product</h1>
+
+    <form id="sellForm" class="form" enctype="multipart/form-data">
+      <div class="input"><label>Product Name</label><input name="name" required placeholder="Recycled Notebook"></div>
+      <div class="input"><label>Price (₹)</label><input name="price" type="number" min="0" required placeholder="150"></div>
+      <div class="input"><label>Eco‑Impact Description</label><input name="ecoImpact" required placeholder="Made from 5 recycled plastic bottles"></div>
+      <div class="input"><label>Product Image</label><input type="file" name="imageFile" accept="image/*"></div>
+      <button class="btn" type="submit">Upload Product</button>
+    </form>
+
+    <div class="grid mt-16">
+      <div class="card"><h3>Clear Photos</h3><div class="kv">Use high‑quality images that show your product clearly</div></div>
+      <div class="card"><h3>Eco‑Impact Story</h3><div class="kv">Explain what was recycled and why it helps</div></div>
+      <div class="card"><h3>Fair Pricing</h3><div class="kv">Price competitively while considering eco‑value</div></div>
+    </div>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

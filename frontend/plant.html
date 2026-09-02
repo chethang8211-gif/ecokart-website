@@ -1,0 +1,26 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EcoKart • Plant Store</title><link rel="stylesheet" href="style.css">
+<script src="auth-guard.js"></script>
+</head><body>
+<header class="topbar">
+  <div class="tb-inner">
+    <div class="brand-wrap"><span class="leaf">🌿</span><span class="brand-name">EcoKart</span></div>
+    <nav class="tb-nav">
+      <a class="tb-link" href="index.html">🏠 Home</a>
+      <a class="tb-link" href="buy.html">🛒 Buy Products</a>
+      <a class="tb-link" href="sell.html">📤 Sell Product</a>
+      <a class="tb-link" href="wallet.html">🪙 EcoCoin Wallet</a>
+      <a class="tb-link active" href="plant.html">🪴 Plant Store</a>
+      <a class="tb-link" href="login.html">🔐 Login</a>
+    </nav>
+    <div class="coins-pill" id="topCoins">0 EcoCoins</div>
+  </div>
+</header>
+
+<main class="container">
+  <div class="center"><h1 class="h1" style="margin:0">Plant Store</h1><span class="badge" id="plant-balance" style="margin-left:10px;background:#eef2ff;color:#3730a3;border-radius:999px;padding:6px 10px">Available Balance: 0 EcoCoins</span></div>
+  <section class="grid" id="plant-grid"></section>
+</main>
+<script src="script.js"></script>
+</body></html>

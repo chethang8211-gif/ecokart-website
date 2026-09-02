@@ -1,0 +1,41 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EcoKart • EcoCoin Wallet</title><link rel="stylesheet" href="style.css">
+<script src="auth-guard.js"></script>
+</head><body>
+<header class="topbar">
+  <div class="tb-inner">
+    <div class="brand-wrap"><span class="leaf">🌿</span><span class="brand-name">EcoKart</span></div>
+    <nav class="tb-nav">
+      <a class="tb-link" href="index.html">🏠 Home</a>
+      <a class="tb-link" href="buy.html">🛒 Buy Products</a>
+      <a class="tb-link" href="sell.html">📤 Sell Product</a>
+      <a class="tb-link active" href="wallet.html">🪙 EcoCoin Wallet</a>
+      <a class="tb-link" href="plant.html">🪴 Plant Store</a>
+      <a class="tb-link" href="login.html">🔐 Login</a>
+    </nav>
+    <div class="coins-pill" id="topCoins">0 EcoCoins</div>
+  </div>
+</header>
+
+<main class="container">
+  <h1 class="h1">EcoCoin Wallet</h1>
+  <p class="sub">Track eco‑friendly impact and rewards</p>
+
+  <div class="stats">
+    <div class="stat green"><div>Current Balance</div><div class="big" id="w-current">0</div><div>EcoCoins available</div></div>
+    <div class="stat blue"><div>Total Earned</div><div class="big" id="w-earned">0</div><div>EcoCoins earned</div></div>
+    <div class="stat purple"><div>Total Redeemed</div><div class="big" id="w-redeemed">0</div><div>EcoCoins used</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="card"><h3>Make Purchases</h3><div class="kv">Earn 1 EcoCoin per ₹10 spent</div></div>
+    <div class="card"><h3>Sell Products</h3><div class="kv">Earn 5 EcoCoins per successful sale</div></div>
+    <div class="card"><h3>Eco Impact</h3><div class="kv">Bonus for high recycling impact</div></div>
+  </div>
+
+  <h2 class="h1 mt-16">Recent Transactions</h2>
+  <div class="list" id="tx-list"></div>
+</main>
+<script src="script.js"></script>
+</body></html>

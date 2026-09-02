@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EcoKart • Sign Up</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="tb-inner">
+    <div class="brand-wrap"><span class="leaf">🌿</span><span class="brand-name">EcoKart</span></div>
+    <nav class="tb-nav">
+      <a class="tb-link" href="index.html">🏠 Home</a>
+      <a class="tb-link" href="buy.html">🛒 Buy Products</a>
+      <a class="tb-link" href="sell.html">📤 Sell Product</a>
+      <a class="tb-link" href="wallet.html">🪙 EcoCoin Wallet</a>
+      <a class="tb-link" href="plant.html">🪴 Plant Store</a>
+      <a class="tb-link active" href="login.html">🔐 Login</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container" style="max-width:420px">
+  <h1 class="h1">Sign Up</h1>
+  <form id="signupForm" class="form">
+    <div class="input"><label>Email</label><input type="email" id="email" placeholder="you@example.com" required /></div>
+    <div class="input"><label>Password</label><input type="password" id="password" placeholder="At least 6 characters" required minlength="6" /></div>
+    <button class="btn" type="submit">Sign Up</button>
+  </form>
+  <p id="error" style="color:#c0392b;font-size:14px;min-height:20px"></p>
+  <p class="sub"><a href="login.html">Already have an account? Log in</a></p>
+</main>
+
+<script>
+  // Frontend is served by the backend, so relative URLs work.
+  // If you host the frontend separately, set this to the backend origin.
+  const API_URL = '';
+
+  document.getElementById('signupForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const errorEl = document.getElementById('error');
+    errorEl.textContent = '';
+
+    try {
+      const res = await fetch(`${API_URL}/api/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        window.location.href = 'login.html';
+      } else {
+        errorEl.textContent = data.error || 'Signup failed';
+      }
+    } catch (err) {
+      errorEl.textContent = 'Could not reach server. Is the backend running?';
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+# Netlify config - publishes the static frontend and proxies API + uploads
+# to the Render backend so all frontend code can keep using relative URLs.
+#
+# 1. Deploy the backend to Render first (see render.yaml).
+# 2. Replace BOTH occurrences of the onrender.com URL below with your service URL.
+# 3. In Netlify: "Add new site" > import this repo. Settings are read from here.
+
+[build]
+  publish = "frontend"
+  command = ""
+
+# ---- API proxy: browser hits /api/* on Netlify, Netlify forwards to Render ----
+[[redirects]]
+  from = "/api/*"
+  to = "https://ecokart-backend.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+# ---- Uploaded product images ----
+[[redirects]]
+  from = "/uploads/*"
+  to = "https://ecokart-backend.onrender.com/uploads/:splat"
+  status = 200
+  force = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
