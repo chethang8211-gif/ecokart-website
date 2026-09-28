@@ -3,7 +3,7 @@
 (function () {
   var cleanPath = location.pathname.split('/').pop().split('?')[0].split('#')[0];
   var page = (cleanPath || 'index.html').toLowerCase();
-  var PUBLIC = ['login.html', 'signup.html', 'index.html', '', 'feedback.html'];
+  var PUBLIC = ['login.html', 'signup.html', 'index.html', '', 'feedback.html', 'admin.html'];
 
   var token = null;
   try { token = localStorage.getItem('token'); } catch (e) {}

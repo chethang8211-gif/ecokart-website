@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>EcoKart • Admin Directory</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="auth-guard.js"></script>
+  <style>
+    .admin-container {
+      max-width: 1100px;
+      margin: 28px auto 48px;
+      padding: 0 16px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 800px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .stat-box {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 4px 12px rgba(15,23,42,0.04);
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--green);
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .admin-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 28px;
+      box-shadow: 0 4px 14px rgba(15,23,42,0.05);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .search-input {
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      width: 260px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      text-align: left;
+    }
+    th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #1e293b;
+    }
+    tr:hover td {
+      background: #f8fafc;
+    }
+    .id-badge {
+      background: #e2e8f0;
+      color: #334155;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+    .email-cell {
+      font-weight: 600;
+      color: #0f172a;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--muted);
+      padding: 8px 16px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+    }
+    .tab-btn.active {
+      color: var(--green);
+      border-bottom: 3px solid var(--green);
+    }
+  </style>
+</head>
+<body>
+<header class="topbar">
+  <div class="tb-inner">
+    <div class="brand-wrap"><span class="leaf">🌿</span><span class="brand-name">EcoKart</span><span style="font-size:12px;background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:999px;margin-left:6px;">ADMIN</span></div>
+    <nav class="tb-nav">
+      <a class="tb-link" href="index.html">🏠 Home</a>
+      <a class="tb-link" href="buy.html">🛒 Buy Products</a>
+      <a class="tb-link" href="wallet.html">🪙 Wallet</a>
+      <a class="tb-link" href="feedback.html">💬 Feedback</a>
+      <a class="tb-link active" href="admin.html">📊 Admin Dashboard</a>
+    </nav>
+  </div>
+</header>
+
+<main class="admin-container">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 class="h1" style="margin:0">Admin & User Directory</h1>
+      <p class="sub" style="margin:4px 0 0">View registered user accounts, feedback submissions, and system statistics.</p>
+    </div>
+    <button class="btn" id="refreshBtn" style="display:flex;align-items:center;gap:6px">🔄 Refresh Data</button>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-number" id="statUsers">--</div>
+      <div class="stat-label">Registered Users</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number" id="statFeedback">--</div>
+      <div class="stat-label">Feedbacks Received</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number" id="statRating" style="color:#f59e0b">-- ★</div>
+      <div class="stat-label">Average Rating</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number" id="statMode" style="font-size:20px;color:#0284c7;text-transform:capitalize">File</div>
+      <div class="stat-label">Storage Engine</div>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div style="display:flex;gap:10px;margin-bottom:18px;border-bottom:1px solid var(--border)">
+    <button class="tab-btn active" id="tabUsersBtn" onclick="switchTab('users')">👥 Registered Users (<span id="userCountLabel">0</span>)</button>
+    <button class="tab-btn" id="tabFbBtn" onclick="switchTab('feedback')">💬 Feedback Submissions (<span id="fbCountLabel">0</span>)</button>
+  </div>
+
+  <!-- Users Section -->
+  <div id="usersSection" class="admin-card">
+    <div class="card-header">
+      <h2 style="margin:0;font-size:18px;color:#0f172a">Registered User Accounts</h2>
+      <input type="text" id="userSearch" class="search-input" placeholder="🔍 Search by email..." oninput="filterUsers()" />
+    </div>
+
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:70px">ID</th>
+            <th>Email Address</th>
+            <th>Registration Date & Time</th>
+            <th style="width:100px">Status</th>
+          </tr>
+        </thead>
+        <tbody id="usersTableBody">
+          <tr><td colspan="4" style="text-align:center;padding:24px;color:var(--muted)">Loading registered users...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Feedback Section -->
+  <div id="feedbackSection" class="admin-card" style="display:none">
+    <div class="card-header">
+      <h2 style="margin:0;font-size:18px;color:#0f172a">User Feedback & Ratings</h2>
+      <input type="text" id="fbSearch" class="search-input" placeholder="🔍 Search feedback..." oninput="filterFeedback()" />
+    </div>
+
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:50px">#</th>
+            <th style="width:120px">Rating</th>
+            <th style="width:150px">User</th>
+            <th style="width:140px">Category</th>
+            <th>Feedback Message</th>
+            <th style="width:120px">Date</th>
+          </tr>
+        </thead>
+        <tbody id="fbTableBody">
+          <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">Loading feedbacks...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+  let allUsers = [];
+  let allFeedback = [];
+
+  function switchTab(tab) {
+    const usersSec = document.getElementById('usersSection');
+    const fbSec = document.getElementById('feedbackSection');
+    const usersBtn = document.getElementById('tabUsersBtn');
+    const fbBtn = document.getElementById('tabFbBtn');
+
+    if (tab === 'users') {
+      usersSec.style.display = 'block';
+      fbSec.style.display = 'none';
+      usersBtn.classList.add('active');
+      fbBtn.classList.remove('active');
+    } else {
+      usersSec.style.display = 'none';
+      fbSec.style.display = 'block';
+      usersBtn.classList.remove('active');
+      fbBtn.classList.add('active');
+    }
+  }
+
+  async function loadData() {
+    try {
+      // 1. Fetch Users
+      const userRes = await fetch('/api/users');
+      if (userRes.ok) {
+        const userData = await userRes.json();
+        allUsers = userData.users || [];
+        document.getElementById('statUsers').textContent = userData.total || allUsers.length;
+        document.getElementById('userCountLabel').textContent = userData.total || allUsers.length;
+        document.getElementById('statMode').textContent = userData.storageMode || 'File';
+        renderUsers(allUsers);
+      } else {
+        document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="4" style="text-align:center;color:#c0392b;padding:16px;">Failed to load users from /api/users</td></tr>';
+      }
+
+      // 2. Fetch Feedback
+      const fbRes = await fetch('/api/feedback');
+      if (fbRes.ok) {
+        const fbData = await fbRes.json();
+        allFeedback = fbData.feedbacks || [];
+        document.getElementById('statFeedback').textContent = fbData.totalCount || allFeedback.length;
+        document.getElementById('fbCountLabel').textContent = fbData.totalCount || allFeedback.length;
+        document.getElementById('statRating').textContent = `${(fbData.averageRating || 5.0).toFixed(1)} ★`;
+        renderFeedback(allFeedback);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Could not connect to backend.');
+    }
+  }
+
+  function renderUsers(list) {
+    const tbody = document.getElementById('usersTableBody');
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--muted)">No registered users found.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = list.map(u => {
+      const dateStr = u.created_at ? new Date(u.created_at).toLocaleString() : 'N/A';
+      return `
+        <tr>
+          <td><span class="id-badge">#${u.id}</span></td>
+          <td class="email-cell">✉️ ${escapeHtml(u.email)}</td>
+          <td>${dateStr}</td>
+          <td><span style="background:#dcfce7;color:#14532d;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700">Active</span></td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function renderFeedback(list) {
+    const tbody = document.getElementById('fbTableBody');
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">No feedback received yet.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = list.map((f, idx) => {
+      const starStr = '★'.repeat(f.rating || 5) + '☆'.repeat(5 - (f.rating || 5));
+      const dateStr = f.created_at ? new Date(f.created_at).toLocaleDateString() : 'N/A';
+      return `
+        <tr>
+          <td><span class="id-badge">#${f.id || (idx + 1)}</span></td>
+          <td style="color:#f59e0b;font-weight:700">${starStr}</td>
+          <td style="font-weight:600">${escapeHtml(f.name || 'Visitor')}</td>
+          <td><span style="background:#f1f5f9;color:#334155;padding:2px 6px;border-radius:4px;font-size:12px">${escapeHtml(f.category || 'General')}</span></td>
+          <td style="max-width:320px">${escapeHtml(f.message)}</td>
+          <td style="color:var(--muted);font-size:12px">${dateStr}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function filterUsers() {
+    const query = document.getElementById('userSearch').value.toLowerCase().trim();
+    const filtered = allUsers.filter(u => (u.email || '').toLowerCase().includes(query));
+    renderUsers(filtered);
+  }
+
+  function filterFeedback() {
+    const query = document.getElementById('fbSearch').value.toLowerCase().trim();
+    const filtered = allFeedback.filter(f => 
+      (f.message || '').toLowerCase().includes(query) || 
+      (f.name || '').toLowerCase().includes(query) ||
+      (f.category || '').toLowerCase().includes(query)
+    );
+    renderFeedback(filtered);
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  document.getElementById('refreshBtn').addEventListener('click', loadData);
+  loadData();
+</script>
+</body>
+</html>
