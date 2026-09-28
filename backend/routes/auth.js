@@ -79,6 +79,30 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// ---------------- Demo Login (One-click access for reviewers & guests) ----------------
+router.post('/demo-login', async (req, res) => {
+  const demoEmail = 'demo@ecokart.com';
+  if (!JWT_SECRET) {
+    return res.status(500).json({ error: 'Server misconfigured: JWT_SECRET is not set' });
+  }
+  try {
+    let user = await store.findByEmail(demoEmail);
+    if (!user) {
+      const hash = await bcrypt.hash('ecokart123', BCRYPT_ROUNDS);
+      user = await store.createUser(demoEmail, hash);
+    }
+    const token = jwt.sign(
+      { sub: user.id, email: user.email },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN }
+    );
+    return res.json({ token, email: user.email });
+  } catch (err) {
+    console.error('[demo-login]', err.message);
+    return res.status(500).json({ error: 'Could not log in with demo account' });
+  }
+});
+
 // ---------------- Protected: current user ----------------
 router.get('/me', requireAuth, async (req, res) => {
   try {

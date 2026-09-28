@@ -1,8 +1,9 @@
-// auth-guard.js - gate every page behind login.
+// auth-guard.js - gate protected pages behind login.
 // Load this FIRST, in <head>, on every page except login.html / signup.html.
 (function () {
-  var page = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
-  var PUBLIC = ['login.html', 'signup.html'];
+  var cleanPath = location.pathname.split('/').pop().split('?')[0].split('#')[0];
+  var page = (cleanPath || 'index.html').toLowerCase();
+  var PUBLIC = ['login.html', 'signup.html', 'index.html', '', 'feedback.html'];
 
   var token = null;
   try { token = localStorage.getItem('token'); } catch (e) {}

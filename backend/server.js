@@ -54,7 +54,7 @@ app.use('/uploads', express.static(UPLOADS_DIR));
 function readJSON(file) {
   const p = path.join(DATA_DIR, file);
   if (!fs.existsSync(p)) {
-    if (file === 'products.json') return [];
+    if (file === 'products.json' || file === 'feedback.json') return [];
     if (file === 'wallet.json') return { coins: 0, totalEarned: 0, totalRedeemed: 0, transactions: [] };
     return {};
   }
@@ -65,17 +65,59 @@ function writeJSON(file, data) {
   fs.writeFileSync(path.join(DATA_DIR, file), JSON.stringify(data, null, 2), 'utf8');
 }
 
-// ---------------- Auth (public) ----------------
-app.use('/api', authRouter);            // /api/signup, /api/login, /api/me
+// ---------------- Public Endpoints ----------------
+app.use('/api', authRouter);            // /api/signup, /api/login, /api/demo-login, /api/me
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
-// ---------------- Everything else under /api needs a valid token ----------------
-app.use('/api', requireAuth);
-
-// ---------------- Products ----------------
-app.get('/api/products', (req, res) => {
+// Browse products without mandatory login
+app.get('/api/products', (_req, res) => {
   res.json(readJSON('products.json'));
 });
+
+// Feedback: Read community reviews
+app.get('/api/feedback', (_req, res) => {
+  const list = readJSON('feedback.json');
+  const validList = Array.isArray(list) ? list : [];
+  const total = validList.length;
+  const avg = total > 0 ? (validList.reduce((acc, f) => acc + (Number(f.rating) || 5), 0) / total).toFixed(1) : 5.0;
+  res.json({
+    feedbacks: [...validList].reverse(), // newest first
+    averageRating: parseFloat(avg),
+    totalCount: total
+  });
+});
+
+// Feedback: Submit new feedback
+app.post('/api/feedback', (req, res) => {
+  const { name, email, rating, category, message } = req.body || {};
+  if (!message || typeof message !== 'string' || !message.trim()) {
+    return res.status(400).json({ success: false, message: 'Feedback message is required' });
+  }
+
+  const list = readJSON('feedback.json');
+  const validList = Array.isArray(list) ? list : [];
+  const id = validList.length ? Math.max(...validList.map(f => f.id || 0)) + 1 : 1;
+
+  const newFeedback = {
+    id,
+    name: (name && name.trim()) || 'Eco-Visitor',
+    email: (email && email.trim()) || '',
+    rating: Math.min(5, Math.max(1, parseInt(rating, 10) || 5)),
+    category: (category && category.trim()) || 'Overall Experience',
+    message: message.trim(),
+    created_at: new Date().toISOString()
+  };
+
+  validList.push(newFeedback);
+  writeJSON('feedback.json', validList);
+
+  res.status(201).json({ success: true, feedback: newFeedback });
+});
+
+// ---------------- Everything below under /api needs a valid token ----------------
+app.use('/api', requireAuth);
+
+// ---------------- Products (Protected Mutations) ----------------
 
 // Create product with image upload (multipart/form-data)
 app.post('/api/products', upload.single('imageFile'), (req, res) => {

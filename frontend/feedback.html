@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EcoKart • Feedback & Reviews</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="auth-guard.js"></script>
+  <style>
+    .feedback-container {
+      max-width: 1050px;
+      margin: 28px auto 48px;
+      padding: 0 16px;
+    }
+    .feedback-hero {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .feedback-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+    @media (max-width: 800px) {
+      .feedback-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+    .star-rating {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 8px 0;
+      font-size: 28px;
+      cursor: pointer;
+    }
+    .star-rating .star {
+      color: #cbd5e1;
+      transition: color 0.15s, transform 0.15s;
+    }
+    .star-rating .star.active {
+      color: #f59e0b;
+    }
+    .star-rating .star:hover {
+      transform: scale(1.15);
+    }
+    .rating-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0aa03f;
+      margin-left: 8px;
+    }
+    .feedback-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+    }
+    .stats-card {
+      background: linear-gradient(135deg, #0aa03f, #057a2e);
+      color: #fff;
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .stats-val {
+      font-size: 32px;
+      font-weight: 900;
+    }
+    .stats-lbl {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+    .fb-item {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+      transition: box-shadow 0.2s;
+    }
+    .fb-item:hover {
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+    }
+    .fb-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .fb-author {
+      font-weight: 700;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .fb-stars {
+      color: #f59e0b;
+      font-size: 16px;
+      letter-spacing: 2px;
+    }
+    .fb-badge {
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #eef9f2;
+      color: #0aa03f;
+      border: 1px solid #ccebd7;
+      font-weight: 600;
+    }
+    .fb-msg {
+      color: #334155;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+    .fb-date {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 8px;
+    }
+    .success-alert {
+      display: none;
+      background: #dcfce7;
+      border: 1px solid #86efac;
+      color: #14532d;
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+<header class="topbar">
+  <div class="tb-inner">
+    <div class="brand-wrap"><span class="leaf">🌿</span><span class="brand-name">EcoKart</span></div>
+    <nav class="tb-nav">
+      <a class="tb-link" href="index.html">🏠 Home</a>
+      <a class="tb-link" href="buy.html">🛒 Buy Products</a>
+      <a class="tb-link" href="sell.html">📤 Sell Product</a>
+      <a class="tb-link" href="wallet.html">🪙 EcoCoin Wallet</a>
+      <a class="tb-link" href="plant.html">🪴 Plant Store</a>
+      <a class="tb-link active" href="feedback.html">💬 Feedback</a>
+      <a class="tb-link" href="login.html">🔐 Login</a>
+    </nav>
+    <div class="coins-pill" id="topCoins">0 EcoCoins</div>
+  </div>
+</header>
+
+<main class="feedback-container">
+  <div class="feedback-hero">
+    <h1 class="h1">Community Feedback & Reviews</h1>
+    <p class="sub">Help us grow and improve EcoKart! Tell us how your experience was or suggest new ideas.</p>
+  </div>
+
+  <div class="feedback-layout">
+    <!-- Left: Feedback Form -->
+    <div class="feedback-card">
+      <h2 style="margin-top:0;font-size:20px;color:#0e5130">Share Your Experience</h2>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:16px">Your suggestions help make our circular eco-platform better for everyone.</p>
+
+      <div id="successAlert" class="success-alert">
+        🎉 Thank you! Your feedback has been received and added to our community wall.
+      </div>
+
+      <form id="feedbackForm">
+        <div class="input">
+          <label>Your Rating</label>
+          <div class="star-rating" id="starContainer">
+            <span class="star active" data-val="1">★</span>
+            <span class="star active" data-val="2">★</span>
+            <span class="star active" data-val="3">★</span>
+            <span class="star active" data-val="4">★</span>
+            <span class="star active" data-val="5">★</span>
+            <span class="rating-label" id="ratingLabel">5 / 5 - Excellent 🌿</span>
+          </div>
+          <input type="hidden" id="ratingInput" value="5">
+        </div>
+
+        <div class="input">
+          <label for="fbCategory">Category</label>
+          <select id="fbCategory" style="padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:14px">
+            <option value="Overall Experience">🌟 Overall Experience</option>
+            <option value="Design & UI">🎨 Website Design & Usability</option>
+            <option value="Recycled Products">♻️ Recycled Marketplace</option>
+            <option value="Plant Rewards">🪴 Plant Store & EcoCoins</option>
+            <option value="Feature Suggestion">💡 Feature Suggestion</option>
+            <option value="Bug Report">🐞 Bug or Issue</option>
+          </select>
+        </div>
+
+        <div class="input">
+          <label for="fbName">Your Name / Handle</label>
+          <input type="text" id="fbName" placeholder="e.g. Maya Patel (or leave blank for Eco-Visitor)" />
+        </div>
+
+        <div class="input">
+          <label for="fbEmail">Your Email (Optional)</label>
+          <input type="email" id="fbEmail" placeholder="you@example.com (optional)" />
+        </div>
+
+        <div class="input">
+          <label for="fbMessage">Your Feedback & Suggestions *</label>
+          <textarea id="fbMessage" rows="4" style="padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;resize:vertical" placeholder="What did you like? What can we improve? Have a feature idea?" required></textarea>
+        </div>
+
+        <button class="btn" type="submit" id="submitBtn" style="width:100%;font-weight:700;margin-top:8px">Submit Feedback 🚀</button>
+      </form>
+    </div>
+
+    <!-- Right: Community Wall -->
+    <div>
+      <div class="stats-card">
+        <div>
+          <div class="stats-val" id="statAvg">5.0 ★</div>
+          <div class="stats-lbl">Average Rating</div>
+        </div>
+        <div>
+          <div class="stats-val" id="statCount">0</div>
+          <div class="stats-lbl">Total Reviews</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <h3 style="margin:0;font-size:18px;color:#0f172a">Recent Reviews</h3>
+        <button class="btn btn-outline" id="refreshBtn" style="padding:6px 12px;font-size:13px">🔄 Refresh</button>
+      </div>
+
+      <div id="feedbackList">
+        <div style="text-align:center;padding:24px;color:var(--muted)">Loading community reviews...</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="script.js"></script>
+<script>
+  let currentRating = 5;
+  const ratingTexts = {
+    1: '1 / 5 - Poor 👎',
+    2: '2 / 5 - Fair 🙂',
+    3: '3 / 5 - Good 👍',
+    4: '4 / 5 - Very Good ✨',
+    5: '5 / 5 - Excellent 🌿'
+  };
+
+  // Interactive Star Selector
+  const starContainer = document.getElementById('starContainer');
+  const ratingInput = document.getElementById('ratingInput');
+  const ratingLabel = document.getElementById('ratingLabel');
+  const stars = starContainer.querySelectorAll('.star');
+
+  function updateStars(val) {
+    stars.forEach(s => {
+      const sVal = parseInt(s.dataset.val, 10);
+      s.classList.toggle('active', sVal <= val);
+    });
+    ratingInput.value = val;
+    ratingLabel.textContent = ratingTexts[val] || `${val} / 5`;
+  }
+
+  stars.forEach(star => {
+    star.addEventListener('click', () => {
+      currentRating = parseInt(star.dataset.val, 10);
+      updateStars(currentRating);
+    });
+    star.addEventListener('mouseenter', () => {
+      updateStars(parseInt(star.dataset.val, 10));
+    });
+  });
+
+  starContainer.addEventListener('mouseleave', () => {
+    updateStars(currentRating);
+  });
+
+  // Pre-fill user details if logged in
+  if (window.AUTH && window.AUTH.token) {
+    fetch('/api/me', { headers: window.AUTH.headers() })
+      .then(r => r.ok ? r.json() : null)
+      .then(user => {
+        if (user && user.email) {
+          const emailInput = document.getElementById('fbEmail');
+          const nameInput = document.getElementById('fbName');
+          if (emailInput && !emailInput.value) emailInput.value = user.email;
+          if (nameInput && !nameInput.value) nameInput.value = user.email.split('@')[0];
+        }
+      })
+      .catch(() => {});
+  }
+
+  // Load Feedbacks from API
+  async function loadFeedback() {
+    const listEl = document.getElementById('feedbackList');
+    const statAvg = document.getElementById('statAvg');
+    const statCount = document.getElementById('statCount');
+
+    try {
+      const res = await fetch('/api/feedback');
+      const data = await res.json();
+      const list = data.feedbacks || [];
+
+      statAvg.textContent = `${(data.averageRating || 5.0).toFixed(1)} ★`;
+      statCount.textContent = data.totalCount || list.length;
+
+      if (!list.length) {
+        listEl.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted)">No feedback submitted yet. Be the first to share your thoughts!</div>';
+        return;
+      }
+
+      listEl.innerHTML = list.map(item => {
+        const starStr = '★'.repeat(item.rating || 5) + '☆'.repeat(5 - (item.rating || 5));
+        const dateStr = item.created_at ? new Date(item.created_at).toLocaleDateString('en-US', {
+          month: 'short', day: 'numeric', year: 'numeric'
+        }) : 'Recently';
+
+        return `
+          <div class="fb-item">
+            <div class="fb-header">
+              <div class="fb-author">
+                <span>👤</span>
+                <span>${escapeHtml(item.name || 'Eco-Visitor')}</span>
+              </div>
+              <span class="fb-badge">${escapeHtml(item.category || 'General')}</span>
+            </div>
+            <div class="fb-stars">${starStr}</div>
+            <div class="fb-msg" style="margin-top:6px;">${escapeHtml(item.message)}</div>
+            <div class="fb-date">Submitted on ${dateStr}</div>
+          </div>
+        `;
+      }).join('');
+    } catch (err) {
+      listEl.innerHTML = '<div style="color:#c0392b;padding:12px;">Could not load reviews. Backend might be starting up.</div>';
+    }
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // Submit Feedback
+  document.getElementById('feedbackForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const alertBox = document.getElementById('successAlert');
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    const payload = {
+      name: document.getElementById('fbName').value,
+      email: document.getElementById('fbEmail').value,
+      rating: parseInt(document.getElementById('ratingInput').value, 10),
+      category: document.getElementById('fbCategory').value,
+      message: document.getElementById('fbMessage').value
+    };
+
+    try {
+      const res = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        alertBox.style.display = 'block';
+        document.getElementById('fbMessage').value = '';
+        currentRating = 5;
+        updateStars(5);
+        await loadFeedback();
+        setTimeout(() => { alertBox.style.display = 'none'; }, 6000);
+      } else {
+        alert(data.message || 'Submission failed. Please try again.');
+      }
+    } catch (err) {
+      alert('Error reaching server. Please check connection.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Submit Feedback 🚀';
+    }
+  });
+
+  document.getElementById('refreshBtn').addEventListener('click', loadFeedback);
+  loadFeedback();
+</script>
+</body>
+</html>
