@@ -5,6 +5,20 @@
 
 require('dotenv').config();
 
+// Normalize environment variables (support lowercase & internal_database_url from Render)
+if (!process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = process.env.internal_database_url || process.env.INTERNAL_DATABASE_URL;
+}
+if (!process.env.JWT_SECRET) {
+  process.env.JWT_SECRET = process.env.jwt_secret;
+}
+if (!process.env.CORS_ORIGIN) {
+  process.env.CORS_ORIGIN = process.env.cors_origin;
+}
+if (!process.env.PGSSL) {
+  process.env.PGSSL = process.env.pgssl || (process.env.DATABASE_URL ? 'true' : undefined);
+}
+
 const express = require('express');
 const cors = require('cors');
 const fs = require('fs');

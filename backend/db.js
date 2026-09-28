@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { Pool } = require('pg');
 
-const DATABASE_URL = process.env.DATABASE_URL;
+const DATABASE_URL = process.env.DATABASE_URL || process.env.internal_database_url || process.env.INTERNAL_DATABASE_URL;
 
 if (!DATABASE_URL) {
   console.warn(
@@ -14,12 +14,11 @@ if (!DATABASE_URL) {
   );
 }
 
+const isSSL = process.env.PGSSL === 'true' || process.env.pgssl === 'true' || (DATABASE_URL && !DATABASE_URL.includes('localhost'));
+
 const pool = new Pool({
   connectionString: DATABASE_URL,
-  // Managed Postgres providers (Render, Neon, Supabase, Heroku) require SSL.
-  // Set PGSSL=true for those; leave unset for a local Postgres.
-  ssl: process.env.PGSSL === 'true' ? { rejectUnauthorized: false } : false,
-  // Fail fast instead of hanging when nothing is listening.
+  ssl: isSSL ? { rejectUnauthorized: false } : false,
   connectionTimeoutMillis: 5000,
 });
 

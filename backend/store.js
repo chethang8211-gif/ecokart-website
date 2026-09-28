@@ -14,7 +14,9 @@ let mode = 'file'; // 'file' | 'pg'
 let db = null;
 
 async function init() {
-  if (process.env.DATABASE_URL) {
+  const dbUrl = process.env.DATABASE_URL || process.env.internal_database_url || process.env.INTERNAL_DATABASE_URL;
+  if (dbUrl) {
+    if (!process.env.DATABASE_URL) process.env.DATABASE_URL = dbUrl;
     try {
       db = require('./db');
       await db.ensureSchema();
