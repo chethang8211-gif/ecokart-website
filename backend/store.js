@@ -99,11 +99,24 @@ async function createUser(email, passwordHash) {
   return { id: user.id, email: user.email, created_at: user.created_at };
 }
 
+async function getAllUsers() {
+  if (mode === 'pg') {
+    const { rows } = await db.query(
+      'SELECT id, email, created_at FROM users ORDER BY id DESC'
+    );
+    return rows;
+  }
+  return readUsers()
+    .map((u) => ({ id: u.id, email: u.email, created_at: u.created_at }))
+    .reverse();
+}
+
 module.exports = {
   init,
   findByEmail,
   findById,
   createUser,
+  getAllUsers,
   get mode() {
     return mode;
   },

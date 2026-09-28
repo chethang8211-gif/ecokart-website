@@ -69,6 +69,16 @@ function writeJSON(file, data) {
 app.use('/api', authRouter);            // /api/signup, /api/login, /api/demo-login, /api/me
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
+// View registered user accounts (admin/management)
+app.get('/api/users', async (_req, res) => {
+  try {
+    const users = await store.getAllUsers();
+    res.json({ total: users.length, storageMode: store.mode, users });
+  } catch (err) {
+    res.status(500).json({ error: 'Could not fetch user list' });
+  }
+});
+
 // Browse products without mandatory login
 app.get('/api/products', (_req, res) => {
   res.json(readJSON('products.json'));
