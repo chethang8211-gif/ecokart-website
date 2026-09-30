@@ -233,9 +233,10 @@ app.get('/', (_req, res) => res.sendFile(path.join(FRONTEND_DIR, 'index.html')))
 
 // ---------------- Boot ----------------
 async function start() {
+  // Start server immediately so cloud health checks pass with zero delay
+  app.listen(PORT, () => console.log(`EcoKart server running on port ${PORT}`));
   // Picks Postgres if DATABASE_URL works, else a local JSON file. Never throws.
   await store.init();
-  app.listen(PORT, () => console.log(`EcoKart server running on port ${PORT}`));
 }
 
 start();
