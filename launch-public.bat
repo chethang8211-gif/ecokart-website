@@ -33,9 +33,9 @@ echo ===================================================
 echo.
 
 if exist "%~dp0cloudflared.exe" (
-    "%~dp0cloudflared.exe" tunnel --url http://localhost:3002
+    "%~dp0cloudflared.exe" tunnel --url http://127.0.0.1:3002
 ) else if exist "%~dp0..\cloudflared.exe" (
-    "%~dp0..\cloudflared.exe" tunnel --url http://localhost:3002
+    "%~dp0..\cloudflared.exe" tunnel --url http://127.0.0.1:3002
 ) else (
     echo cloudflared.exe not found, falling back to SSH tunnel...
     ssh -o StrictHostKeyChecking=no -R 80:localhost:3002 nokey@localhost.run

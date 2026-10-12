@@ -41,13 +41,28 @@ const app = express();
 const PORT = process.env.PORT || 3002;
 
 const FRONTEND_DIR = path.join(__dirname, '..', 'frontend');
-const DATA_DIR = path.join(__dirname, 'data');
-const UPLOADS_DIR = path.join(__dirname, 'uploads');
+const SEED_DATA_DIR = path.join(__dirname, 'data');
+const IS_VERCEL = Boolean(process.env.VERCEL || process.env.NOW_REGION);
 
-// On a fresh host (e.g. Render) these folders may not exist yet.
-for (const dir of [DATA_DIR, UPLOADS_DIR]) {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+// In serverless environments like Vercel, the source directory is read-only.
+// We use /tmp for writes, falling back gracefully to in-memory caching.
+const DATA_DIR = IS_VERCEL ? path.join('/tmp', 'ecokart-data') : SEED_DATA_DIR;
+const UPLOADS_DIR = IS_VERCEL ? path.join('/tmp', 'ecokart-uploads') : path.join(__dirname, 'uploads');
+
+try {
+  for (const dir of [DATA_DIR, UPLOADS_DIR]) {
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  }
+} catch (e) {
+  console.warn('[storage] Note: Could not create data/uploads dir synchronously:', e.message);
 }
+
+// In-memory fallback in case of serverless filesystem write restrictions
+const memoryStore = {
+  products: null,
+  feedback: null,
+  wallet: null
+};
 
 // Storage for uploads -> backend/uploads
 const upload = multer({ dest: UPLOADS_DIR });
@@ -64,19 +79,62 @@ app.use(express.static(FRONTEND_DIR));
 // Serve uploaded images
 app.use('/uploads', express.static(UPLOADS_DIR));
 
+// Normalization middleware for Vercel/proxies:
+// If request arrives as /products instead of /api/products, normalize it
+app.use((req, _res, next) => {
+  if (!req.url.startsWith('/api') && !req.url.startsWith('/uploads') && !req.url.includes('.')) {
+    const apiRoutes = ['/health', '/users', '/products', '/feedback', '/signup', '/login', '/demo-login', '/me', '/wallet', '/buy', '/earn', '/redeem'];
+    const pathname = req.url.split('?')[0];
+    if (apiRoutes.includes(pathname)) {
+      req.url = '/api' + req.url;
+    }
+  }
+  next();
+});
+
 // ---------------- Helpers ----------------
 function readJSON(file) {
-  const p = path.join(DATA_DIR, file);
-  if (!fs.existsSync(p)) {
-    if (file === 'products.json' || file === 'feedback.json') return [];
-    if (file === 'wallet.json') return { coins: 0, totalEarned: 0, totalRedeemed: 0, transactions: [] };
-    return {};
+  const baseName = file.replace('.json', '');
+  if (memoryStore[baseName]) {
+    return memoryStore[baseName];
   }
-  const raw = fs.readFileSync(p, 'utf8') || 'null';
-  try { return JSON.parse(raw); } catch { return {}; }
+
+  // 1. Try active DATA_DIR (e.g. /tmp/ecokart-data or backend/data)
+  const p = path.join(DATA_DIR, file);
+  if (fs.existsSync(p)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(p, 'utf8') || 'null');
+      if (data !== null) return data;
+    } catch {}
+  }
+
+  // 2. Fallback to bundled seed data in backend/data
+  const seedPath = path.join(SEED_DATA_DIR, file);
+  if (fs.existsSync(seedPath)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(seedPath, 'utf8') || 'null');
+      if (data !== null) return data;
+    } catch {}
+  }
+
+  // 3. Fallback defaults
+  if (file === 'products.json' || file === 'feedback.json') return [];
+  if (file === 'wallet.json') return { coins: 0, totalEarned: 0, totalRedeemed: 0, transactions: [] };
+  return {};
 }
+
 function writeJSON(file, data) {
-  fs.writeFileSync(path.join(DATA_DIR, file), JSON.stringify(data, null, 2), 'utf8');
+  const baseName = file.replace('.json', '');
+  memoryStore[baseName] = data;
+
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    fs.writeFileSync(path.join(DATA_DIR, file), JSON.stringify(data, null, 2), 'utf8');
+  } catch (err) {
+    console.warn(`[storage] Notice: filesystem write skipped for ${file} (${err.message}). Using memory cache.`);
+  }
 }
 
 // ---------------- Public Endpoints ----------------
@@ -228,15 +286,34 @@ app.post('/api/redeem', (req, res) => {
   res.json({ success:true, wallet:w });
 });
 
+// ---------------- Store Initialization ----------------
+let initPromise = null;
+function initStore() {
+  if (!initPromise) {
+    initPromise = store.init().catch((err) => {
+      console.error('[store] init error:', err);
+    });
+  }
+  return initPromise;
+}
+
+// In serverless environments, ensure store is initialized for API routes
+app.use('/api', async (_req, _res, next) => {
+  try {
+    await initStore();
+  } catch {}
+  next();
+});
+
 // ---------------- Misc ----------------
 app.get('/', (_req, res) => res.sendFile(path.join(FRONTEND_DIR, 'index.html')));
 
-// ---------------- Boot ----------------
-async function start() {
-  // Start server immediately so cloud health checks pass with zero delay
-  app.listen(PORT, () => console.log(`EcoKart server running on port ${PORT}`));
-  // Picks Postgres if DATABASE_URL works, else a local JSON file. Never throws.
-  await store.init();
+// ---------------- Boot (Local Dev / Traditional Node) ----------------
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`EcoKart server running on port ${PORT}`);
+    initStore();
+  });
 }
 
-start();
+module.exports = app;

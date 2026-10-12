@@ -8,10 +8,14 @@
 const fs = require('fs');
 const path = require('path');
 
-const USERS_FILE = path.join(__dirname, 'data', 'users.json');
+const IS_VERCEL = Boolean(process.env.VERCEL || process.env.NOW_REGION);
+const USERS_DIR = IS_VERCEL ? path.join('/tmp', 'ecokart-data') : path.join(__dirname, 'data');
+const USERS_FILE = path.join(USERS_DIR, 'users.json');
+const SEED_USERS_FILE = path.join(__dirname, 'data', 'users.json');
 
 let mode = 'file'; // 'file' | 'pg'
 let db = null;
+let memUsers = null;
 
 async function init() {
   const dbUrl = process.env.DATABASE_URL || process.env.internal_database_url || process.env.INTERNAL_DATABASE_URL;
@@ -26,31 +30,59 @@ async function init() {
     } catch (err) {
       const { describeDbError } = require('./db');
       console.error('[store] Postgres not usable: ' + describeDbError(err));
-      console.error('[store] falling back to file store (backend/data/users.json)');
+      console.error('[store] falling back to file/memory store');
     }
   } else {
-    console.log('[store] users: file store (backend/data/users.json) - set DATABASE_URL to use Postgres');
+    console.log('[store] users: file/memory store - set DATABASE_URL to use Postgres');
   }
   mode = 'file';
   ensureFile();
 }
 
 function ensureFile() {
-  const dir = path.dirname(USERS_FILE);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  if (!fs.existsSync(USERS_FILE)) fs.writeFileSync(USERS_FILE, '[]\n');
-}
-
-function readUsers() {
   try {
-    return JSON.parse(fs.readFileSync(USERS_FILE, 'utf8') || '[]');
-  } catch {
-    return [];
+    if (!fs.existsSync(USERS_DIR)) fs.mkdirSync(USERS_DIR, { recursive: true });
+    if (!fs.existsSync(USERS_FILE)) {
+      if (fs.existsSync(SEED_USERS_FILE)) {
+        fs.copyFileSync(SEED_USERS_FILE, USERS_FILE);
+      } else {
+        fs.writeFileSync(USERS_FILE, '[]\n');
+      }
+    }
+  } catch (e) {
+    console.warn('[store] Note: could not ensure users file on disk:', e.message);
   }
 }
 
+function readUsers() {
+  if (memUsers) return memUsers;
+
+  if (fs.existsSync(USERS_FILE)) {
+    try {
+      memUsers = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8') || '[]');
+      if (Array.isArray(memUsers)) return memUsers;
+    } catch {}
+  }
+
+  if (fs.existsSync(SEED_USERS_FILE)) {
+    try {
+      memUsers = JSON.parse(fs.readFileSync(SEED_USERS_FILE, 'utf8') || '[]');
+      if (Array.isArray(memUsers)) return memUsers;
+    } catch {}
+  }
+
+  memUsers = [];
+  return memUsers;
+}
+
 function writeUsers(list) {
-  fs.writeFileSync(USERS_FILE, JSON.stringify(list, null, 2) + '\n');
+  memUsers = list;
+  try {
+    if (!fs.existsSync(USERS_DIR)) fs.mkdirSync(USERS_DIR, { recursive: true });
+    fs.writeFileSync(USERS_FILE, JSON.stringify(list, null, 2) + '\n');
+  } catch (err) {
+    console.warn('[store] Disk write skipped for users.json:', err.message);
+  }
 }
 
 async function findByEmail(email) {

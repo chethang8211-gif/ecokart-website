@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "backend/**"
+    }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.js" },
+    { "source": "/uploads/(.*)", "destination": "/api/index.js" },
+    { "source": "/", "destination": "/frontend/index.html" },
+    { "source": "/buy", "destination": "/frontend/buy.html" },
+    { "source": "/sell", "destination": "/frontend/sell.html" },
+    { "source": "/wallet", "destination": "/frontend/wallet.html" },
+    { "source": "/plant", "destination": "/frontend/plant.html" },
+    { "source": "/feedback", "destination": "/frontend/feedback.html" },
+    { "source": "/login", "destination": "/frontend/login.html" },
+    { "source": "/signup", "destination": "/frontend/signup.html" },
+    { "source": "/dashboard", "destination": "/frontend/dashboard.html" },
+    { "source": "/admin", "destination": "/frontend/admin.html" },
+    { "source": "/((?!api/|uploads/).*)", "destination": "/frontend/$1" }
+  ]
+}
